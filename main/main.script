@@ -1,0 +1,43 @@
+local pointer = require("pointer_lock.pointer")
+
+local function random_position()
+	return vmath.vector3(math.random(-9, 9), math.random(7, 20), math.random(-9, 9))
+end
+
+function init(self)
+	msg.post("@render:", "clear_color", {color = vmath.vector4(149/255, 165/255, 166/255, 1)})
+	msg.post(".", "acquire_input_focus")
+	math.randomseed(socket.gettime())
+
+	for _ = 1,50 do
+		factory.create("#factory", random_position())
+	end
+end
+
+function on_input(self, action_id, action)
+	if not action_id and pointer.locked then
+		go.set("/camera_focus", "euler.x", go.get("/camera_focus", "euler.x") + action.dy)
+		go.set("/camera_focus", "euler.y", go.get("/camera_focus", "euler.y") - action.dx)
+	end
+
+	if action_id == hash("key_esc") and action.pressed then
+		local skip_events = pointer.locked
+		pointer.locked = false
+		pointer_lock_ext.glfw_mouse_unlock()
+
+		return skip_events
+	elseif action_id == hash("touch") and action.pressed then
+		if not pointer.locked then
+			pointer.locked = true
+			pointer_lock_ext.glfw_mouse_lock()
+
+			return true
+		end
+	elseif action_id == hash("key_d") and action.pressed then
+		msg.post("@system:", "toggle_physics_debug")
+	elseif action_id == hash("scroll_up") then
+		go.set("/camera", "position.z", go.get("/camera", "position.z") - 0.5)
+	elseif action_id == hash("scroll_down") then
+		go.set("/camera", "position.z", go.get("/camera", "position.z") + 0.5)
+	end
+end

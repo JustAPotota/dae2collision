@@ -1,5 +1,6 @@
 [bootstrap]
 main_collection = /main/main.collectionc
+render = /rendercam/rendercam.renderc
 
 [script]
 shared_state = 1
@@ -13,7 +14,18 @@ input_method = HiddenInputField
 
 [project]
 title = dae2collision
+dependencies#0 = https://github.com/rgrams/rendercam/archive/refs/tags/1.0.3.zip
+dependencies#1 = https://github.com/indiesoftby/defold-pointer-lock/archive/refs/heads/main.zip
 
 [library]
 include_dirs = /dae2collision
+
+[physics]
+type = 3D
+scale = 0.1
+max_contacts = 256
+max_collisions = 128
+
+[graphics]
+max_debug_vertices = 12800
 

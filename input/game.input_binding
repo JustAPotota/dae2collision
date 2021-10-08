@@ -1,4 +1,20 @@
+key_trigger {
+  input: KEY_ESC
+  action: "key_esc"
+}
+key_trigger {
+  input: KEY_D
+  action: "key_d"
+}
 mouse_trigger {
   input: MOUSE_BUTTON_1
   action: "touch"
+}
+mouse_trigger {
+  input: MOUSE_WHEEL_UP
+  action: "scroll_up"
+}
+mouse_trigger {
+  input: MOUSE_WHEEL_DOWN
+  action: "scroll_down"
 }
