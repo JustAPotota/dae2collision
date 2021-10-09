@@ -61,7 +61,7 @@ local function build_convexshape(verts)
 	return out
 end
 
-function M.from_string(s)
+function M.shapes_from_string(s)
 	parser:parse(s)
 	local geometries = handler.root.COLLADA.library_geometries.geometry
 	local up_axis = handler.root.COLLADA.asset.up_axis
@@ -123,7 +123,7 @@ end
 ]]--
 function M.generate_collision(dae_path, properties)
 	local name = dae_path:sub(2,-5)
-	local shapes = M.from_string(read(dae_path:sub(2)))
+	local shapes = M.shapes_from_string(read(dae_path:sub(2)))
 	local digits = #tostring(#shapes)
 
 	local out = ""
