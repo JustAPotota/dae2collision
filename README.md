@@ -6,7 +6,7 @@ You can use dae2collision in your own project by adding it as a Defold library d
 
 https://github.com/JustAPotota/dae2collision/archive/master.zip
 
-Or point to the ZIP file of a specific release, like https://github.com/JustAPotota/dae2collision/archive/v1.0.zip.
+Or point to the ZIP file of a specific release, like https://github.com/JustAPotota/dae2collision/archive/v1.0.0.zip.
 
 # Usage
 The [`d2c` module](dae2collision/d2c.lua) exposes two functions intended to be used in an [editor script](https://defold.com/manuals/editor-scripts/):
