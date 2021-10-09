@@ -21,7 +21,7 @@ function M.get_commands()
                 local path = editor.get(opts.selection, "path")
                 d2c.generate_collision(path, {
                     type = "COLLISION_OBJECT_TYPE_STATIC",
-                    mass = 1,
+                    mass = 0,
                     friction = 0.1,
                     restitution = 0.5,
                     linear_damping = 0,
