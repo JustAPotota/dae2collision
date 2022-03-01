@@ -6,7 +6,7 @@ You can use dae2collision in your own project by adding it as a Defold library d
 
 https://github.com/JustAPotota/dae2collision/archive/master.zip
 
-Or point to the ZIP file of a specific release, like https://github.com/JustAPotota/dae2collision/archive/v1.0.0.zip.
+Or point to the ZIP file of a specific release, like https://github.com/JustAPotota/dae2collision/archive/v1.1.0.zip.
 
 # Usage
 This library comes with an [editor script](https://defold.com/manuals/editor-scripts/) (located at [`/dae2collision/d2c.editor_script`](dae2collision/d2c.editor_script)) that adds a context menu option to `.dae` files which uses [d2c.generate_collision](#d2cgenerate_collisiondae_path-properties) to create a game object with collision objects in the shape of the selected mesh. The collision objects are given default properties which will work for many, but not all, games. If you need custom settings for your game, you can simply make a copy of the included editor script or build your own using one of the two functions provided by the [`d2c` module](dae2collision/d2c.lua):
