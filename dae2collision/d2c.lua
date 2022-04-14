@@ -1,9 +1,7 @@
 local xml2lua = require("dae2collision.xml2lua.xml2lua")
-local handler = require("dae2collision.xml2lua.tree")
+local xmltree = require("dae2collision.xml2lua.tree")
 
 local M = {}
-
-local parser = xml2lua.parser(handler)
 
 -- Split a string into an array by spaces
 local function split(s)
@@ -61,10 +59,18 @@ local function build_convexshape(verts)
 	return out
 end
 
-function M.shapes_from_string(s)
+local function parse_xml(s)
+	local handler = xmltree:new()
+	local parser = xml2lua.parser(handler)
 	parser:parse(s)
-	local geometries = handler.root.COLLADA.library_geometries.geometry
-	local up_axis = handler.root.COLLADA.asset.up_axis
+	return handler
+end
+
+function M.shapes_from_string(s)
+	local xml = parse_xml(s)
+
+	local geometries = xml.root.COLLADA.library_geometries.geometry
+	local up_axis = xml.root.COLLADA.asset.up_axis
 
 	-- Make sure geometries is an array
 	if geometries[1] == nil then
