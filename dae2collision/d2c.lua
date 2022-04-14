@@ -147,12 +147,12 @@ function M.generate_collision(dae_path, properties)
   "mass: %f\n"
   "friction: %f\n"
   "restitution: %f\n"
+  "group: \"%s\"\n"
+  "mask: \"%s\"\n"
   "linear_damping: %f\n"
   "angular_damping: %f\n"
   "locked_rotation: %s\n"
   "bullet: %s\n"
-  "group: \"%s\"\n"
-  "mask: \"%s\"\n"
   ""
   position {
     x: 0.0
@@ -171,12 +171,12 @@ function M.generate_collision(dae_path, properties)
 			properties.mass,
 			properties.friction,
 			properties.restitution,
+			properties.group,
+			properties.mask,
 			properties.linear_damping,
 			properties.angular_damping,
 			properties.locked_rotation and "true" or "false",
-			properties.bullet and "true" or "false",
-			properties.group,
-			properties.mask
+			properties.bullet and "true" or "false"
 		)
 	end
 
