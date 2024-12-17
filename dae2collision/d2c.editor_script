@@ -13,29 +13,32 @@ local COLLISION_TYPE_NAMES = {
     "Dynamic", "Kinematic", "Static", "Trigger"
 }
 
+local DEFAULT_PROPERTIES = {
+    type = "Static",
+    mass = 1,
+    friction = 0.1,
+    restitution = 0.5,
+    linear_damping = 0,
+    angular_damping = 0,
+    locked_rotation = false,
+    bullet = false,
+    group = "default",
+    mask = "default"
+}
+
+local function clone(t)
+    local new = {}
+    for k,v in pairs(t) do
+        new[k] = v
+    end
+    return new
+end
+
 local function get_extension(path)
     return path:match("%.(%w+)$")
 end
 
 local function field(name, id, type, collision_properties, options)
---     return editor.ui.horizontal({
---         padding = editor.ui.PADDING.NONE,
---         spacing = editor.ui.SPACING.MEDIUM,
---         children = {
---             editor.ui.label({
---                 text = name
---             }),
--- 
---             editor.ui[type]({
---                 grow = true,
---                 value = collision_properties[id],
---                 options = options,
---                 on_value_changed = function(new_value) collision_properties[id] = new_value end
---             })
---         }
---     })
-
-
     return {
         editor.ui.label({ text = name }),
         editor.ui[type]({
@@ -75,20 +78,9 @@ function M.get_commands()
                 return get_extension(editor.get(opts.selection, "path")) == "dae"
             end,
             run = function(opts)
-                local collision_properties = {
-                    type = "Static",
-                    mass = 1,
-                    friction = 0.1,
-                    restitution = 0.5,
-                    linear_damping = 0,
-                    angular_damping = 0,
-                    locked_rotation = false,
-                    bullet = false,
-                    group = "default",
-                    mask = "default"
-                }
+                local dae_path = editor.get(opts.selection, "path")
+                local collision_properties = editor.prefs.get("d2c.autofill")[dae_path] or clone(DEFAULT_PROPERTIES)
 
-                local path = editor.get(opts.selection, "path")
                 local result = editor.ui.show_dialog(editor.ui.dialog({
                     title = "Generate Collision",
                     content = editor.ui.grid({
@@ -114,11 +106,42 @@ function M.get_commands()
                     }
                 }))
 
-                collision_properties.type = COLLISION_TYPE_MAP[collision_properties.type]
+                local autofill = editor.prefs.get("d2c.autofill")
+                autofill[dae_path] = collision_properties
+                editor.prefs.set("d2c.autofill", autofill)
 
-                if result then d2c.generate_collision(path, collision_properties) end
+                if result then
+                    collision_properties.type = COLLISION_TYPE_MAP[collision_properties.type]
+                    d2c.generate_collision(dae_path, collision_properties)
+                end
             end
         }
+    }
+end
+
+function M.get_prefs_schema()
+    return {
+        ["d2c.schema_version"] = editor.prefs.schema.integer({ default = 0, scope = editor.prefs.SCOPE.PROJECT }),
+        ["d2c.autofill"] = editor.prefs.schema.object_of({
+            key = editor.prefs.schema.string({ scope = editor.prefs.SCOPE.PROJECT }),
+            val = editor.prefs.schema.object({
+                properties = {
+                    type = editor.prefs.schema.enum({ values = COLLISION_TYPE_NAMES }),
+                    mass = editor.prefs.schema.number(),
+                    friction = editor.prefs.schema.number(),
+                    restitution = editor.prefs.schema.number(),
+                    linear_damping = editor.prefs.schema.number(),
+                    angular_damping = editor.prefs.schema.number(),
+                    locked_rotation = editor.prefs.schema.boolean(),
+                    bullet = editor.prefs.schema.boolean(),
+                    group = editor.prefs.schema.string(),
+                    mask = editor.prefs.schema.string()
+                },
+                default = DEFAULT_PROPERTIES,
+                scope = editor.prefs.SCOPE.PROJECT
+            }),
+            scope = editor.prefs.SCOPE.PROJECT
+        })
     }
 end
 
