@@ -127,19 +127,19 @@ end
 	mask = "player,enemies"
 }
 ]]--
-function M.generate_collision(dae_path, properties)
-	local name = dae_path:sub(2,-5)
-	local shapes = M.shapes_from_string(read(dae_path:sub(2)))
+function M.generate_collision(dae_path, properties, convexshape_path_format)
+	local shapes = M.shapes_from_string(read(dae_path))
 	local digits = #tostring(#shapes)
 
-	local out = ""
-	for i,v in ipairs(shapes) do
+	local go = ""
+	local shape_paths = {}
+	for i,shape in ipairs(shapes) do
 		-- Write convex shape
-		local shape_path = name .. "_" .. ("%0" .. digits .. "i"):format(i) .. ".convexshape"
-		write(shape_path, v)
+		local shape_path = convexshape_path_format:format(("%0" .. digits .. "i"):format(i))
+		shape_paths[shape_path] = shape
 
 		-- Add collision object to game object
-		out = out .. ([[embedded_components {
+		go = go .. ([[embedded_components {
   id: "collisionobject]] .. i .. [["
   type: "collisionobject"
   data: "collision_shape: \"/]] .. shape_path .. [[\"\n"
@@ -180,8 +180,7 @@ function M.generate_collision(dae_path, properties)
 		)
 	end
 
-	write(name .. "_generated.go", out)
-	print("[D2C] Generated collision for " .. dae_path)
+	return go, shape_paths
 end
 
 return M

@@ -78,7 +78,7 @@ function M.get_commands()
                 return get_extension(editor.get(opts.selection, "path")) == "dae"
             end,
             run = function(opts)
-                local dae_path = editor.get(opts.selection, "path")
+                local dae_path = editor.get(opts.selection, "path"):sub(2)
                 local collision_properties = editor.prefs.get("d2c.autofill")[dae_path] or clone(DEFAULT_PROPERTIES)
 
                 local result = editor.ui.show_dialog(editor.ui.dialog({
@@ -112,7 +112,20 @@ function M.get_commands()
 
                 if result then
                     collision_properties.type = COLLISION_TYPE_MAP[collision_properties.type]
-                    d2c.generate_collision(dae_path, collision_properties)
+                    local go, shapes = d2c.generate_collision(dae_path, collision_properties, dae_path:gsub("%.dae$", "_%%s.convexshape"))
+
+                    local go_path = dae_path:gsub("%.dae$", "_generated.go")
+                    local file = assert(io.open(go_path, "w"))
+                    file:write(go)
+                    file:close()
+
+                    for path, shape in pairs(shapes) do
+                        local file = assert(io.open(path, "w"))
+                        file:write(shape)
+                        file:close()
+                    end
+
+                    print("[D2C] Generated collision for /" .. dae_path)
                 end
             end
         }
