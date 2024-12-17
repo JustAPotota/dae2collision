@@ -1,0 +1,56 @@
+fonts {
+  name: "default"
+  font: "/builtins/fonts/default.font"
+}
+textures {
+  name: "main"
+  texture: "/main/assets/main.atlas"
+}
+nodes {
+  position {
+    y: 640.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  color {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  type: TYPE_BOX
+  texture: "main/tips_background"
+  id: "background"
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_TOP
+  pivot: PIVOT_NW
+  inherit_alpha: true
+  slice9 {
+    x: 32.0
+    y: 32.0
+    z: 32.0
+    w: 32.0
+  }
+  alpha: 0.3
+}
+nodes {
+  position {
+    x: 5.0
+    y: -5.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_TEXT
+  text: "Click + Drag: Rotate\n"
+  "Scroll Wheel: Zoom\n"
+  "D: Toggle Debug"
+  font: "default"
+  id: "text"
+  pivot: PIVOT_NW
+  parent: "background"
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT

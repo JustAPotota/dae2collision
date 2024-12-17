@@ -1,5 +1,3 @@
-local pointer = require("pointer_lock.pointer")
-
 local function random_position()
 	return vmath.vector3(math.random(-9, 9), math.random(7, 20), math.random(-9, 9))
 end
@@ -15,23 +13,16 @@ function init(self)
 end
 
 function on_input(self, action_id, action)
-	if not action_id and pointer.locked then
-		go.set("/camera_focus", "euler.x", go.get("/camera_focus", "euler.x") + action.dy)
-		go.set("/camera_focus", "euler.y", go.get("/camera_focus", "euler.y") - action.dx)
+	if not action_id and window.get_mouse_lock() then
+		go.set("/camera_focus", "euler.x", go.get("/camera_focus", "euler.x") + action.dy * 0.7)
+		go.set("/camera_focus", "euler.y", go.get("/camera_focus", "euler.y") - action.dx * 0.7)
 	end
 
-	if action_id == hash("key_esc") and action.pressed then
-		local skip_events = pointer.locked
-		pointer.locked = false
-		pointer_lock_ext.glfw_mouse_unlock()
-
-		return skip_events
-	elseif action_id == hash("touch") and action.pressed then
-		if not pointer.locked then
-			pointer.locked = true
-			pointer_lock_ext.glfw_mouse_lock()
-
-			return true
+	if action_id == hash("touch") then
+		if action.pressed then
+			window.set_mouse_lock(true)
+		elseif action.released then
+			window.set_mouse_lock(false)
 		end
 	elseif action_id == hash("key_d") and action.pressed then
 		msg.post("@system:", "toggle_physics_debug")

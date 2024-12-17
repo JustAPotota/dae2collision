@@ -1,0 +1,19 @@
+local HORIZONTAL_BOUNDS = vmath.vector3(8, 0, 8)
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("trigger_response") and message.enter then
+		local position = go.get_position()
+		position.y = position.y + 400
+
+		position.x = position.x % (HORIZONTAL_BOUNDS.x * 2) - HORIZONTAL_BOUNDS.x / 2
+		position.z = position.z % (HORIZONTAL_BOUNDS.z * 2) - HORIZONTAL_BOUNDS.z / 2
+
+		msg.post("#collisionobject", "disable")
+		timer.delay(0, false, function()
+			go.set_position(position)
+			timer.delay(0, false, function()
+				msg.post("#collisionobject", "enable")
+			end)
+		end)
+	end
+end
