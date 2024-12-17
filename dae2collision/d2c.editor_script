@@ -2,25 +2,81 @@ local d2c = require("dae2collision.d2c")
 
 local M = {}
 
+local COLLISION_TYPE_MAP = {
+    Dynamic = "COLLISION_OBJECT_TYPE_DYNAMIC",
+    Kinematic = "COLLISION_OBJECT_TYPE_KINEMATIC",
+    Static = "COLLISION_OBJECT_TYPE_STATIC",
+    Trigger = "COLLISION_OBJECT_TYPE_TRIGGER"
+}
+
+local COLLISION_TYPE_NAMES = {
+    "Dynamic", "Kinematic", "Static", "Trigger"
+}
+
 local function get_extension(path)
     return path:match("%.(%w+)$")
+end
+
+local function field(name, id, type, collision_properties, options)
+--     return editor.ui.horizontal({
+--         padding = editor.ui.PADDING.NONE,
+--         spacing = editor.ui.SPACING.MEDIUM,
+--         children = {
+--             editor.ui.label({
+--                 text = name
+--             }),
+-- 
+--             editor.ui[type]({
+--                 grow = true,
+--                 value = collision_properties[id],
+--                 options = options,
+--                 on_value_changed = function(new_value) collision_properties[id] = new_value end
+--             })
+--         }
+--     })
+
+
+    return {
+        editor.ui.label({ text = name }),
+        editor.ui[type]({
+            grow = true,
+            value = collision_properties[id],
+            options = options,
+            on_value_changed = function(new_value) collision_properties[id] = new_value end
+        })
+    }
+end
+
+local function string_field(name, id, collision_properties)
+    return field(name, id, "string_field", collision_properties)
+end
+
+local function number_field(name, id, collision_properties)
+    return field(name, id, "number_field", collision_properties)
+end
+
+local function check_box(name, id, collision_properties)
+    return field(name, id, "check_box", collision_properties)
+end
+
+local function dropdown(name, id, collision_properties, options)
+    return field(name, id, "select_box", collision_properties, options)
 end
 
 function M.get_commands()
     return {
         {
-            label = "Generate Collision - Default",
-            locations = {"Edit", "Assets"},
+            label = "Generate Collision",
+            locations = { "Edit", "Assets" },
             query = {
-                selection = {type = "resource", cardinality = "one"}
+                selection = { type = "resource", cardinality = "one" }
             },
             active = function(opts)
                 return get_extension(editor.get(opts.selection, "path")) == "dae"
             end,
             run = function(opts)
-                local path = editor.get(opts.selection, "path")
-                d2c.generate_collision(path, {
-                    type = "COLLISION_OBJECT_TYPE_STATIC",
+                local collision_properties = {
+                    type = "Static",
                     mass = 1,
                     friction = 0.1,
                     restitution = 0.5,
@@ -30,7 +86,37 @@ function M.get_commands()
                     bullet = false,
                     group = "default",
                     mask = "default"
-                })
+                }
+
+                local path = editor.get(opts.selection, "path")
+                local result = editor.ui.show_dialog(editor.ui.dialog({
+                    title = "Generate Collision",
+                    content = editor.ui.grid({
+                        padding = editor.ui.PADDING.SMALL,
+                        spacing = editor.ui.SPACING.MEDIUM,
+                        children = {
+                            dropdown("Type", "type", collision_properties, COLLISION_TYPE_NAMES),
+                            number_field("Mass", "mass", collision_properties),
+                            number_field("Friction", "friction", collision_properties),
+                            number_field("Restitution", "restitution", collision_properties),
+                            number_field("Linear Damping", "linear_damping", collision_properties),
+                            number_field("Angular Damping", "angular_damping", collision_properties),
+                            check_box("Locked Rotation", "locked_rotation", collision_properties),
+                            check_box("Bullet", "bullet", collision_properties),
+                            string_field("Group", "group", collision_properties),
+                            string_field("Mask", "mask", collision_properties),
+                        },
+                        columns = { {}, { grow = true } },
+                    }),
+                    buttons = {
+                        editor.ui.dialog_button({ text = "Close", cancel = true, result = false }),
+                        editor.ui.dialog_button({ text = "Generate", default = true, result = true }),
+                    }
+                }))
+
+                collision_properties.type = COLLISION_TYPE_MAP[collision_properties.type]
+
+                if result then d2c.generate_collision(path, collision_properties) end
             end
         }
     }
