@@ -9,7 +9,7 @@ embedded_components {
   "name: \"unnamed\"\n"
   "materials {\n"
   "  name: \"default\"\n"
-  "  material: \"/main/model.material\"\n"
+  "  material: \"/main/materials/model.material\"\n"
   "  textures {\n"
   "    sampler: \"tex0\"\n"
   "    texture: \"/main/assets/marble.png\"\n"

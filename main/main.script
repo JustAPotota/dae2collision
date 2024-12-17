@@ -6,16 +6,36 @@ function init(self)
 	msg.post("@render:", "clear_color", {color = vmath.vector4(149/255, 165/255, 166/255, 1)})
 	msg.post(".", "acquire_input_focus")
 	math.randomseed(socket.gettime())
+	self.camera_rotation = go.get("/camera_focus", "euler")
+
+	self.camera_dx = 0
+	self.camera_dy = 0
 
 	for _ = 1,50 do
 		factory.create("#factory", random_position())
 	end
 end
 
+function update(self, dt)
+	if math.abs(self.camera_dx) > 0.1 then
+		local camera_dx = self.camera_dx * 0.2
+		self.camera_dx = self.camera_dx - camera_dx
+
+		go.set("/camera_focus", "euler.x", go.get("/camera_focus", "euler.x") + camera_dx)
+	end
+
+	if math.abs(self.camera_dy) > 0.1 then
+		local camera_dy = self.camera_dy * 0.2
+		self.camera_dy = self.camera_dy - camera_dy
+
+		go.set("/camera_focus", "euler.y", go.get("/camera_focus", "euler.y") + camera_dy)
+	end
+end
+
 function on_input(self, action_id, action)
-	if not action_id and window.get_mouse_lock() then
-		go.set("/camera_focus", "euler.x", go.get("/camera_focus", "euler.x") + action.dy * 0.7)
-		go.set("/camera_focus", "euler.y", go.get("/camera_focus", "euler.y") - action.dx * 0.7)
+	if not action_id and window.get_mouse_lock() and math.abs(action.dx) + math.abs(action.dy) < 100 then
+		self.camera_dx = self.camera_dx + action.dy * 0.7
+		self.camera_dy = self.camera_dy - action.dx * 0.7
 	end
 
 	if action_id == hash("touch") then
